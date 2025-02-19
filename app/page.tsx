@@ -1,14 +1,15 @@
-import { Button } from "@/components/ui/button";
-import connectDB from "@/utils/db";
-import Image from "next/image";
+import ExpenseChart from "./components/ExpenseChart";
+import TransactionForm from "./components/TransactioinsForm";
+import TransactionList from "./components/TransactionList";
 
-connectDB();
 
 export default function Home() {
   return (
-    <>
-
-      <Button>Click me</Button>
-    </>
+    <main>
+      <h1>Personal Finance Tracker</h1>
+      <TransactionForm />
+      <TransactionList />
+      <ExpenseChart transactions={[]} />
+    </main>
   );
 }
