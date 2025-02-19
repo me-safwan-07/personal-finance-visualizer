@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
-export default function TransactionForm({ onAdd }: { onAdd?: () => void }) {
+export default function TransactionForm() {
   const [form, setForm] = useState({ amount: "", description: "", date: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
