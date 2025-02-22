@@ -1,23 +1,69 @@
-import { NextRequest, NextResponse } from "next/server";
-import { connectToDB } from "@/lib/db";
-import Transaction from "@/lib/transactions";
+import dbConnect from "@/lib/db";
+import Transaction from "@/models/Transaction";
+import { NextResponse } from "next/server";
 
 export async function GET() {
-  await connectToDB();
-  const transactions = await Transaction.find().sort({ date: -1 });
-  return NextResponse.json(transactions);
-}
+  try {
+    await dbConnect();
+    const transactions = await Transaction.find({}).sort({ date: -1 });
+    return NextResponse.json(transactions);
+  } catch (err) {
+    return NextResponse.json({error: 'Failed to fetch transactions', err }, { status: 500});
+  }
+};
 
-export async function POST(req: NextRequest) {
-  await connectToDB();
-  const data = await req.json();
-  const transaction = await Transaction.create(data);
-  return NextResponse.json(transaction);
-}
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    await dbConnect();
+    const transaction = await Transaction.create(body);
+    return NextResponse.json(transaction, { status: 201 });
+  } catch (err) {
+    return NextResponse.json({error: 'Failed to create transaction', err }, { status: 500});
+  }
+};
 
-export async function DELETE(req: NextRequest) {
-  await connectToDB();
-  const { id } = await req.json();
-  await Transaction.findByIdAndDelete(id);
-  return NextResponse.json({ message: "Deleted successfully" });
-}
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({error: 'Missing transaction ID'}, { status: 400 });
+    }
+
+    await dbConnect();
+    const transaction = await Transaction.findByIdAndDelete(id);
+
+    if (!transaction) {
+      return NextResponse.json({error: 'Transaction not found'}, { status: 404 });
+    }
+
+    return NextResponse.json({ message: 'Transaction deleted successfully' });
+  } catch (err) {
+    return NextResponse.json({error: 'Failed to delete transaction', err }, { status: 500});
+  }
+};
+
+export async function PUT(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    
+    if (!id) {
+      return NextResponse.json({error: 'Missing transaction ID'}, { status: 400 });
+    }
+    
+    const body = await request.json();
+    await dbConnect();
+    const transaction = await Transaction.findByIdAndUpdate(id, body);
+    
+    if (!transaction) {
+      return NextResponse.json({error: 'Transaction not found'}, { status: 404 });
+    }
+    
+    return NextResponse.json(transaction);
+  } catch (err) {
+    return NextResponse.json({error: 'Failed to update transaction', err }, { status: 500});
+  }
+};
