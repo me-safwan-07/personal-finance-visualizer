@@ -1,10 +1,15 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TTransaction } from "@/types/transaction";
 import { ArrowUpCircle, ArrowDownCircle, Wallet, TrendingUp } from "lucide-react";
 
-
-export default function FinancialSummary({ transactions }) {
+interface FinancialSummaryProps {
+  transactions: TTransaction[];
+}
+export default function FinancialSummary({ 
+  transactions 
+}: FinancialSummaryProps) {
   const stats = transactions.reduce((acc, transaction) => {
     if (transaction.type === 'income') { 
       acc.totalIncome += transaction.amount;
@@ -23,19 +28,19 @@ export default function FinancialSummary({ transactions }) {
   const items = [
     {
       title: "Total Income",
-      value: `$${stats.totalIncome.toFixed(2)}`,
+      value: `${stats.totalIncome.toFixed(2)}`,
       icon: ArrowUpCircle,
       color: "text-green-500",
     },
     {
       title: "Total Expenses",
-      value: `$${stats.totalExpenses.toFixed(2)}`,
+      value: `${stats.totalExpenses.toFixed(2)}`,
       icon: ArrowDownCircle,
       color: "text-red-500",
     },
     {
       title: "Net Savings",
-      value: `$${netSavings.toFixed(2)}`,
+      value: `${netSavings.toFixed(2)}`,
       icon: Wallet,
       color: "text-blue-500",
     },

@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TTransaction } from "@/types/transaction";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
 const COLORS = [
@@ -11,8 +12,13 @@ const COLORS = [
   'hsl(var(--chart-5))',
 ];
 
-export default function CategoryBreakdown({ transactions }) {
-  const categoryData = transactions.reduce((acc, transaction) => {
+interface CategoryBreakdownProps {
+  transactions: TTransaction[];
+}
+
+
+export default function CategoryBreakdown({ transactions }: CategoryBreakdownProps) {
+  const categoryData = transactions.reduce<Record<string, number>>((acc, transaction) => {
     if (transaction.type === 'expense') {
       if (!acc[transaction.category]) {
         acc[transaction.category] = 0;
@@ -51,7 +57,7 @@ export default function CategoryBreakdown({ transactions }) {
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value) => [`$${value.toFixed(2)}`, 'Amount']}
+                formatter={(value) => [`${(value as number).toFixed(2)}`, 'Amount']}
               />
               <Legend />
             </PieChart>

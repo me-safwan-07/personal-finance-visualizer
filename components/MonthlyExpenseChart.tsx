@@ -10,9 +10,16 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { format } from 'date-fns';
+import { TTransaction } from '@/types/transaction';
 
-export default function MonthlyExpenseChart({ transactions }) {
-  const monthlyData = transactions.reduce((acc, transaction) => {
+interface MonthlyExpenseChartProps {
+  transactions: TTransaction[];
+}
+
+export default function MonthlyExpenseChart({ 
+  transactions 
+}: MonthlyExpenseChartProps) {
+  const monthlyData = transactions.reduce<Record<string, number>>((acc, transaction) => {
     const month = format(new Date(transaction.date), 'MMM yyyy');
     if (!acc[month]) {
       acc[month] = 0;
@@ -34,7 +41,7 @@ export default function MonthlyExpenseChart({ transactions }) {
           <XAxis dataKey="month" />
           <YAxis />
           <Tooltip
-            formatter={(value) => [`$${value.toFixed(2)}`, 'Total Expenses']}
+            formatter={(value) => [`${Number(value).toFixed(2)}`, 'Total Expenses']}
           />
           <Bar dataKey="total" fill="hsl(var(--primary))" />
         </BarChart>

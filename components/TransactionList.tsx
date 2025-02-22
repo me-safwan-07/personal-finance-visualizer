@@ -20,6 +20,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import TransactionForm from './TransactionForm';
+import { TTransaction, TTransactionFormData } from '@/types/transaction';
 
 const getStageColor = (stage: string) => {
   switch (stage) {
@@ -34,31 +35,12 @@ const getStageColor = (stage: string) => {
   }
 };
 
-interface Transaction {
-  _id: string;
-  date: string;
-  description: string;
-  category: string;
-  type: 'income' | 'expense';
-  stage: string;
-  amount: number;
-}
-
-interface TransactionFormData {
-  date: Date;
-  description: string;
-  category: string;
-  type: 'income' | 'expense';
-  stage: string;
-  amount: string;
-}
 
 interface TransactionListProps {
-  transactions: Transaction[];
+  transactions: TTransaction[];
   onDelete: (id: string) => void;
-  onEdit: (id: string, data: TransactionFormData) => void;
+  onEdit: (id: string, data: TTransactionFormData) => void;
 }
-
 export default function TransactionList({ 
   transactions,
   onDelete,
@@ -104,7 +86,7 @@ export default function TransactionList({
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  ${transaction.amount.toFixed(2)}
+                  {transaction.amount.toFixed(2)}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
@@ -119,17 +101,17 @@ export default function TransactionList({
                           <DialogTitle>Edit Transaction</DialogTitle>
                         </DialogHeader>
                         <TransactionForm
-                          onSubmit={(updatedTransaction: Partial<Transaction>) =>
+                          onSubmit={(updatedTransaction: TTransactionFormData) =>
                           onEdit(transaction._id, updatedTransaction)
                           }
                           initialData={{
-                            amount: transaction.amount.toString(),
-                            description: transaction.description,
-                            date: new Date(transaction.date),
-                            category: transaction.category,
-                            type: transaction.type,
-                            stage: transaction.stage,
-                          } as TransactionFormData}
+                          amount: transaction.amount,
+                          description: transaction.description,
+                          date: new Date(transaction.date),
+                          category: transaction.category,
+                          type: transaction.type,
+                          stage: transaction.stage,
+                          } as TTransactionFormData}
                         />
                         </DialogContent>
                     </Dialog>

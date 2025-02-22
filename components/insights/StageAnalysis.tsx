@@ -2,9 +2,20 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { TTransaction } from "@/types/transaction";
 
-export default function StageAnalysis({ transactions }) {
-  const stageStats = transactions.reduce((acc, transaction) => {
+interface StageAnalysisProps {
+  transactions: TTransaction[];
+}
+
+export default function StageAnalysis({ 
+  transactions 
+}: StageAnalysisProps) {
+  interface StageStats {
+    [key: string]: { count: number; amount: number };
+  }
+  
+  const stageStats = transactions.reduce<StageStats>((acc, transaction) => {
     if (!acc[transaction.stage]) {
       acc[transaction.stage] = {
         count: 0,

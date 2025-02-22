@@ -1,9 +1,14 @@
 'use client';
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TTransaction } from '@/types/transaction';
 import { Wallet, TrendingUp, TrendingDown, Calendar } from 'lucide-react';
 
-export function WalletCards({ transactions }) {
+interface WalletCardsProps {
+  transactions: TTransaction[];
+}
+export function WalletCards({ 
+  transactions 
+}: WalletCardsProps) {
   const totalExpenses = transactions.reduce(
     (sum, transaction) => sum + transaction.amount,
     0

@@ -25,10 +25,10 @@ import {
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
-import { TransactionFormProps } from '@/types/transaction';
+import { TTransactionFormData } from '@/types/transaction';
 
 const formSchema = z.object({
-  amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+  amount: z.number().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
     message: 'Amount must be a positive number',
   }),
   description: z.string().min(3, {
@@ -48,11 +48,16 @@ const formSchema = z.object({
   }),
 });
 
-export default function TransactionForm({ onSubmit, initialData }: TransactionFormProps) {
+interface TransactioinsFormProps {
+  onSubmit: (transaction: TTransactionFormData) => void;
+  initialData?: TTransactionFormData;
+}
+
+export default function TransactionForm({ onSubmit, initialData }: TransactioinsFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
-      amount: '',
+      amount: 0,
       description: '',
       date: new Date(),
       category: 'Other',
@@ -62,6 +67,7 @@ export default function TransactionForm({ onSubmit, initialData }: TransactionFo
   });
 
   function onSubmitForm(values: z.infer<typeof formSchema>) {
+    
     onSubmit({
       ...values,
       amount: Number(values.amount),
@@ -77,7 +83,7 @@ export default function TransactionForm({ onSubmit, initialData }: TransactionFo
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount ($)</FormLabel>
+              <FormLabel>Amount</FormLabel>
               <FormControl>
                 <Input placeholder="0.00" {...field} />
               </FormControl>
