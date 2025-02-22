@@ -1,36 +1,40 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI!;
-
-if (!MONGODB_URI) {
-  throw new Error("Please define the MONGODB_URI environment variable");
+if (!process.env.MONGODB_URI) {
+  throw new Error('Please add your MONGODB_URI to .env.local');
 }
 
-// Define a global type for caching the connection
-interface MongooseCache {
-  conn: mongoose.Connection | null;
-  promise: Promise<mongoose.Connection> | null;
+const MONGODB_URI: string = process.env.MONGODB_URI;
+
+let cached = (global as any).mongoose;
+
+if (!cached) {
+  cached = (global as any).mongoose = { conn: null, promise: null };
 }
 
-// Use a global variable to prevent multiple connections
-const globalCache = global as unknown as { mongoose?: MongooseCache };
-
-if (!globalCache.mongoose) {
-  globalCache.mongoose = { conn: null, promise: null };
-}
-
-export async function connectToDB() {
-  if (globalCache.mongoose?.conn) return globalCache.mongoose.conn;
-
-  if (!globalCache.mongoose?.promise) {
-    (globalCache.mongoose as MongooseCache).promise = mongoose
-      .connect(MONGODB_URI, {
-        dbName: "finance",
-        bufferCommands: false,
-      })
-      .then((m) => m.connection);
+async function dbConnect() {
+  if (cached.conn) {
+    return cached.conn;
   }
 
-    globalCache.mongoose!.conn = await globalCache.mongoose!.promise;
-    return globalCache.mongoose!.conn;
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+    };
+
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      return mongoose;
+    });
   }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
+
+  return cached.conn;
+}
+
+export default dbConnect;
