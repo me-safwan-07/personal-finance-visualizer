@@ -12,7 +12,7 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { WalletCards } from '@/components/ui/wallet-cards';
 import { useToast } from '@/components/ui/use-toast';
-import { TransactionFormData } from '@/types/transaction';
+import { TTransactionCategory, TTransactionFormData } from '@/types/transaction';
 
 
 export default function Home() {
@@ -40,7 +40,7 @@ export default function Home() {
     }
   };
 
-  const addTransaction = async (transaction: TransactionFormData) => {
+  const addTransaction = async (transaction: TTransactionFormData): Promise<void> => {
     try {
       const response = await fetch('/api/transactions', {
         method: 'POST',
@@ -88,18 +88,21 @@ export default function Home() {
     }
   };
 
-  const editTransaction = async (id: string, updatedTransaction: TransactionFormData) => {
+  const editTransaction = async (id: string, updatedTransaction: TTransactionFormData) => {
     try {
       const response = await fetch(`/api/transactions?id=${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedTransaction),
+        body: JSON.stringify({
+          ...updatedTransaction,
+          category: updatedTransaction.category as TTransactionCategory,
+        }),
       });
-      
+  
       if (!response.ok) throw new Error('Failed to update transaction');
-      
+  
       await fetchTransactions();
       toast({
         title: 'Success',
@@ -113,6 +116,8 @@ export default function Home() {
       });
     }
   };
+  
+  
 
   if (loading) {
     return (
